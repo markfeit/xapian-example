@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+
+import sys
+import xapian
+
+NRESULTS = 10
+
+if len(sys.argv) < 2:
+    print("Usage: %s PATH_TO_DATABASE SEARCH_TERMS" % (sys.argv[0]), file=sys.stderr)
+    sys.exit(1)
+
+database = xapian.Database(sys.argv[1])
+enquire = xapian.Enquire(database)
+stemmer = xapian.Stem("english")
+query_string = str.join(' ', sys.argv[2:])
+
+qp = xapian.QueryParser()
+stemmer = xapian.Stem("english")
+qp.set_stemmer(stemmer)
+qp.set_database(database)
+qp.set_stemming_strategy(xapian.QueryParser.STEM_SOME)
+query = qp.parse_query(query_string)
+
+# Display the top NRESULTS
+
+enquire.set_query(query)
+matches = enquire.get_mset(0, NRESULTS)
+
+print("First %d of %d for '%s'" % (NRESULTS, matches.get_matches_estimated(), query_string))
+
+for match in matches:
+    print("\n%3i%% Relevant:" % (match.percent))
+    lines = match.document.get_data().decode('utf-8').split("\n")
+    lines = [ "     " + line for line in lines ]
+    print("\n".join(lines))
