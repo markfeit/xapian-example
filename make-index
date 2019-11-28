@@ -10,49 +10,42 @@ if len(sys.argv) != 2:
     print("Usage: %s PATH_TO_DATABASE" % (sys.argv[0]), file=sys.stderr)
     sys.exit(1)
 
-try:
-   
-    # Open the database for update, creating a new database if necessary.
-    database = xapian.WritableDatabase(sys.argv[1], xapian.DB_CREATE_OR_OPEN)
+# Open the database for update, creating a new database if necessary.
+database = xapian.WritableDatabase(sys.argv[1], xapian.DB_CREATE_OR_OPEN)
 
-    indexer = xapian.TermGenerator()
-    stemmer = xapian.Stem("english")
-    indexer.set_stemmer(stemmer)
+indexer = xapian.TermGenerator()
+stemmer = xapian.Stem("english")
+indexer.set_stemmer(stemmer)
 
-    record = {}
+record = {}
 
-    for line in sys.stdin:
+for line in sys.stdin:
 
-        line = line[:-1]
+    line = line[:-1]
 
-        if line != "":
+    if line != "":
 
-            # Accumulate fields
-            (key, value) = line.split(":", 2)
-            record[key] = value
+        # Accumulate fields
+        (key, value) = line.split(": ", 2)
+        record[key] = value
 
-        else:
-            # Add the document to the index
+    else:
 
-            doctext = "\n".join(["%s:%s" % (k,v) for (k, v) in record.items()])
-            alltext = " ".join([v for (k, v) in record.items()])
-            vin = record["vin"]
+        # Add the document to the index
 
-            doc = xapian.Document()
-            doc.set_data(doctext)
-            
-            # Specially-stored items, indexed by number.
-            doc.add_value(0, vin)
-            
-            indexer.set_document(doc)
-            indexer.index_text(alltext)
-            database.add_document(doc)
+        doc = xapian.Document()
 
-            # Reset for the next one
-            record = {}
+        # Stored document, containing the verbatim copy
+        doctext = "\n".join(["%s: %s" % (k,v) for (k, v) in record.items()])
+        doc.set_data(doctext)
 
+        indexer.set_document(doc)
 
-except Exception as ex:
+        # Text of field values only, which is what's indexed
+        alltext = " ".join([v for (k, v) in record.items()])
+        indexer.index_text(alltext)
 
-    print >> sys.stderr, "Exception: %s" % str(ex)
-    sys.exit(1)
+        database.add_document(doc)
+
+        # Reset for the next one
+        record = {}

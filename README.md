@@ -1,6 +1,8 @@
 # xapian-example
 
-A simple example of using Xapian to store and index text documents
+This is a simple example of using Xapian in Python to index a set of
+documents and then search them.
+
 
 ## Prerequisites
 
@@ -8,6 +10,7 @@ The following RPMs need to be installed:
 
  * perl-interpreter
  * python3-xapian
+
 
 ## Running the Example
 

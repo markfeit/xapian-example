@@ -309,6 +309,6 @@ Z
 \* ----------------------------------------------------------------------------
 
 %MAIN
-vin:\VIN\!date:\DATE\!soldto:\PERSON\!make:\MAKE\!type:\TYPE\!miles:\MILEAGE\!color:\COLOR\!options:\OPTIONS\!location:\LOCATION\!\!
+VIN: \VIN\!Date: \DATE\!Buyer: \PERSON\!Make: \MAKE\!Type: \TYPE\!Miles: \MILEAGE\!Color: \COLOR\!Options: \OPTIONS\!Location: \LOCATION\!\!
 
 %%
